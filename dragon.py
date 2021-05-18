@@ -1,3 +1,4 @@
+import math
 import argparse
 import turtle as t
 
@@ -33,17 +34,18 @@ def draw_curve(turt: t.Turtle, n_steps:int, size:int=5) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
-    parser.add_argument('n_steps', type=int)
+    parser.add_argument('n_steps', type=int, default=5)
     parser.add_argument('size', type=int, default=5)
+    #parser.add_argument('kwargs', type=dict, default={})
     return parser
 
-def build_turtle() -> t.Turtle:
+def build_turtle(color='blue') -> t.Turtle:
     turt = t.Turtle()
     # turt.penup()
     # turt.setx(500)
     # turt.sety(250)
     # turt.pendown()
-    turt.color('blue')
+    turt.color(color)
     turt.speed('fastest')
     return turt
 
