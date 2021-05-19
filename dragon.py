@@ -21,8 +21,8 @@ def get_system(n_steps:int) -> str:
         return_sys = get_next_line(return_sys)
     return return_sys
 
-def draw_curve(turt: t.Turtle, n_steps:int, size:int=5) -> None:
-    angle = 90
+def draw_curve(turt: t.Turtle, n_steps:int, size:int=5, angle=90) -> None:
+    angle = angle
     system = get_system(n_steps)
     for cmd in system:
         if cmd in ('F', 'G'):
@@ -36,6 +36,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument('n_steps', type=int, default=5)
     parser.add_argument('size', type=int, default=5)
+    parser.add_argument('angle', type=int, default=90)
     #parser.add_argument('kwargs', type=dict, default={})
     return parser
 
@@ -53,7 +54,7 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
     turt = build_turtle()
-    draw_curve(turt, args.n_steps, args.size)
+    draw_curve(turt, args.n_steps, args.size, args.angle)
     t.mainloop()
 
 if __name__ == '__main__':
