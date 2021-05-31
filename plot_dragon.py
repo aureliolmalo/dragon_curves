@@ -30,8 +30,9 @@ def set_up_main_logger(level:int):
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument('n_steps', type=int, default=5)
-    parser.add_argument('size', type=int, default=5)
-    parser.add_argument('loglevel', type=int, default=0)
+    #parser.add_argument('size', type=int, default=5)
+    #parser.add_argument('loglevel', type=int, default=0)
+    parser.add_argument('color', type=str, default='blue')
     #parser.add_argument('angle', type=int, default=90)
     #parser.add_argument('kwargs', type=dict, default={})
     return parser
@@ -123,7 +124,7 @@ def get_coords(n_steps:int, size:float):
 
 def make_plot(x, y, **kwargs):
     fig, ax = plt.subplots()
-    ax.plot(x, y)
+    ax.plot(x, y, **kwargs)
     return fig, ax
 
 def get_name():
@@ -134,10 +135,14 @@ def get_name():
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    set_up_main_logger(args.loglevel)
-    x, y = get_coords(n_steps = args.n_steps, size=args.size)
-    kwargs = {}
+    set_up_main_logger(0)
+    x, y = get_coords(n_steps = args.n_steps, size=1)
+    kwargs = {'c': args.color}
     fig, ax = make_plot(x, y, **kwargs)
+    lims = (-1, max(x.max(), y.max()) + 1)
+    ax.set_ylim(lims)
+    ax.set_xlim(lims)
+    ax.axis('off')
     name = get_name()
     print(name)
     fig.savefig(dpi=1000, fname=name)
