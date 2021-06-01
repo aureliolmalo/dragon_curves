@@ -30,6 +30,7 @@ def set_up_main_logger(level:int):
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument('n_steps', type=int, default=5)
+    parser.add_argument('angle', type=float, default=0.0)
     #parser.add_argument('size', type=int, default=5)
     #parser.add_argument('loglevel', type=int, default=0)
     parser.add_argument('color', type=str, default='blue')
@@ -41,60 +42,37 @@ def init_ary(length:int) -> np.ndarray:
     ary = np.full(shape=(length +1, ), fill_value=np.nan, dtype=np.float64)
     return ary
 
-def next_z(z:complex, sym_iter, state:str, size:float) -> complex:
+def next_z(z:complex, sym_iter, angle:float, size:float) -> complex:
     logger = lg.getLogger('main')
     logger.debug(f'starting z-value: {z}')
     sym = ''
-    r_step = 1
-    i_step = 0
+    r_step = math.cos(angle)
+    i_step = math.sin(angle)
     
     logger.debug('starting find loop')
     while sym not in ('F', 'G'):
         sym = next(sym_iter)
         logger.debug(f'found symbol: {sym}')
         if sym == '+':
-            if state == 'E':
-                r_step = 0
-                i_step = 1
-                state = 'N'
-            elif state == 'N':
-                r_step = -1
-                i_step = 0
-                state = 'W'
-            elif state == 'W':
-                r_step = 0
-                i_step = -1
-                state = 'S'
-            elif state == 'S':
-                r_step = 1
-                i_step = 0
-                state='E'
+           r_step = math.cos(angle)
+           i_step = math.sin(angle)
         elif sym == '-':
-            if state == 'E':
-                r_step = 0
-                i_step = -1
-                state = 'S'
-            elif state == 'N':
-                r_step = 1
-                i_step = 0
-                state = 'E'
-            elif state == 'W':
-                r_step = 0
-                i_step = 1
-                state = 'N'
-            elif state == 'S':
-                r_step = -1
-                i_step = 0
-                state = 'W'
-        logger.debug(f'changed state value to {state}')
-        logger.debug(f'step in real direction: {r_step}')
-        logger.debug(f'step in imaginary direction: {i_step}')
+           r_step = math.cos((-1)*angle)
+           i_step = math.sin((-1)*angle)
+        angle += math.tau / 4
+        logger.debug(f'changed angle value to {angle: .2f}')
+        logger.debug(f'step in real direction: {r_step: .2f}')
+        logger.debug(f'step in imaginary direction: {i_step: .2f}')
 
     next_z = complex(z.real + r_step * size, z.imag + i_step * size)
-    logger.debug(f'next z-value: {next_z}')
-    return next_z, state
+    if next_z.imag < 0:
+        cpx_sign = '-'
+    else:
+        cpx_sign = '+'
+    logger.debug(f'next z-value: {next_z.real :.2f}{cpx_sign}{abs(next_z.imag) :.2f}i')
+    return next_z, angle
 
-def get_coords(n_steps:int, size:float):
+def get_coords(n_steps:int, size:float, angle:float):
     logger = lg.getLogger('main')
     system_string = get_system(n_steps)
     system_iter = iter(system_string)
@@ -106,12 +84,12 @@ def get_coords(n_steps:int, size:float):
     
     check_stop = False
     idx = 1
-    state = 'E'
+    
     while not check_stop:
         try:
             logger.info('finding next z value')
-            z, state = next_z(z=z, state=state, sym_iter=system_iter, size=size)
-            logger.info(f'found next z value {z} with state {state}')
+            z, angle = next_z(z=z, angle=angle, sym_iter=system_iter, size=size)
+            #logger.info(f'found next z value {z} with angle {angle}')
         except StopIteration:
             check_stop = True
         x[idx] = z.real
@@ -135,8 +113,9 @@ def get_name():
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    set_up_main_logger(10)
-    x, y = get_coords(n_steps = args.n_steps, size=1)
+    set_up_main_logger(0)
+    angle = math.radians(args.angle)
+    x, y = get_coords(n_steps = args.n_steps, size=1, angle=angle)
     kwargs = {'c': args.color}
     fig, ax = make_plot(x, y, **kwargs)
     # lims = (-1, max(x.max(), y.max()) + 1)
