@@ -113,15 +113,15 @@ def get_name():
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    set_up_main_logger(0)
+    set_up_main_logger(lg.DEBUG)
     angle = math.radians(args.angle)
     x, y = get_coords(n_steps = args.n_steps, size=1, angle=angle)
-    kwargs = {'c': args.color}
+    kwargs = {'c': args.color, 'marker':'o'}
     fig, ax = make_plot(x, y, **kwargs)
     # lims = (-1, max(x.max(), y.max()) + 1)
     # ax.set_ylim(lims)
     # ax.set_xlim(lims)
-    ax.axis('off')
+    # ax.axis('off')
     name = get_name()
     print(name)
     fig.savefig(dpi=1000, fname=name)
