@@ -45,6 +45,7 @@ def init_ary(length:int) -> np.ndarray:
 def next_z(z:complex, sym_iter, angle:float, size:float) -> complex:
     logger = lg.getLogger('main')
     logger.debug(f'starting z-value: {z}')
+    logger.debug(f'starting angle {angle: .2f}')
     sym = ''
     r_step = math.cos(angle)
     i_step = math.sin(angle)
@@ -54,15 +55,16 @@ def next_z(z:complex, sym_iter, angle:float, size:float) -> complex:
         sym = next(sym_iter)
         logger.debug(f'found symbol: {sym}')
         if sym == '+':
+           angle = angle + (math.tau / 4)
            r_step = math.cos(angle)
            i_step = math.sin(angle)
         elif sym == '-':
+           angle = angle - (math.tau / 4)
            r_step = math.cos((-1)*angle)
            i_step = math.sin((-1)*angle)
-        angle += math.tau / 4
         logger.debug(f'changed angle value to {angle: .2f}')
-        logger.debug(f'step in real direction: {r_step: .2f}')
-        logger.debug(f'step in imaginary direction: {i_step: .2f}')
+    logger.debug(f'step in real direction: {r_step: .2f}')
+    logger.debug(f'step in imaginary direction: {i_step: .2f}')
 
     next_z = complex(z.real + r_step * size, z.imag + i_step * size)
     if next_z.imag < 0:
@@ -87,7 +89,7 @@ def get_coords(n_steps:int, size:float, angle:float):
     
     while not check_stop:
         try:
-            logger.info('finding next z value')
+            logger.info(f'Iteration {idx-1}')
             z, angle = next_z(z=z, angle=angle, sym_iter=system_iter, size=size)
             #logger.info(f'found next z value {z} with angle {angle}')
         except StopIteration:
